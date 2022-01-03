@@ -3,16 +3,17 @@ package action
 import (
 	"errors"
 	"github.com/aerostatka/db-testing/internal/domains"
+	"github.com/aerostatka/db-testing/internal/service"
 	"go.uber.org/zap"
 	"os"
 )
 
 type DbAction struct {
-	service domains.ConnectionTestService
+	service service.ConnectionTestService
 	log     *zap.Logger
 }
 
-func createDbAction(s domains.ConnectionTestService, logger *zap.Logger) *DbAction {
+func createDbAction(s service.ConnectionTestService, logger *zap.Logger) *DbAction {
 	return &DbAction{
 		service: s,
 		log:     logger,
@@ -24,7 +25,7 @@ func (action *DbAction) SanityCheck() error {
 		os.Getenv("DB_PORT") == "" ||
 		os.Getenv("DB_NAME") == "" ||
 		os.Getenv("DB_USERNAME") == "" {
-		return errors.New("Required db parameters are not specified")
+		return errors.New("Required mysql parameters are not specified")
 	}
 
 	return nil

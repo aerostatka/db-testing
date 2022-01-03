@@ -4,11 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aerostatka/db-testing/internal/domains"
+	"github.com/aerostatka/db-testing/internal/service"
 	"go.uber.org/zap"
 )
 
 const (
-	ConsoleModeDbTest       = "db-test"
+	ConsoleModeDbTest       = "mysql-test"
 	ConsoleModeDynamoDbTest = "dynamo-test"
 )
 
@@ -22,7 +23,7 @@ type FactoryInterface interface {
 }
 
 type DefaultFactory struct {
-	service domains.ConnectionTestService
+	service service.ConnectionTestService
 	log     *zap.Logger
 }
 
@@ -35,7 +36,7 @@ func (factory *DefaultFactory) GetAction(mode string) (ConsoleAction, error) {
 	}
 }
 
-func CreateDefaultFactory(s domains.ConnectionTestService, logger *zap.Logger) *DefaultFactory {
+func CreateDefaultFactory(s service.ConnectionTestService, logger *zap.Logger) *DefaultFactory {
 	return &DefaultFactory{
 		service: s,
 		log:     logger,

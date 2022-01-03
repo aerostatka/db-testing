@@ -3,8 +3,8 @@ package app
 import (
 	"fmt"
 	"github.com/aerostatka/db-testing/internal/action"
-	"github.com/aerostatka/db-testing/internal/db"
-	"github.com/aerostatka/db-testing/internal/domains"
+	"github.com/aerostatka/db-testing/internal/mysql"
+	service2 "github.com/aerostatka/db-testing/internal/service"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -20,8 +20,8 @@ func Start(mode string) {
 	}
 	defer dbClient.Close()
 
-	dbRep := db.CreateDbConnectionRepository(dbClient, logger)
-	service := domains.CreateDefaultConnectionService(dbRep, logger)
+	dbRep := mysql.CreateDbConnectionRepository(dbClient, logger)
+	service := service2.CreateDefaultConnectionService(dbRep, logger)
 
 	factory := action.CreateDefaultFactory(service, logger)
 	action, err := factory.GetAction(mode)
@@ -59,7 +59,7 @@ func getLogger() *zap.Logger {
 }
 
 func getDbClient() (*sqlx.DB, error) {
-	dbConfig := db.LoadConfig()
+	dbConfig := mysql.LoadConfig()
 	client, err := sqlx.Open(
 		"mysql",
 		fmt.Sprintf(

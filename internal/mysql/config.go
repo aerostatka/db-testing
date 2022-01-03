@@ -1,4 +1,4 @@
-package db
+package mysql
 
 import (
 	"os"
@@ -7,22 +7,22 @@ import (
 )
 
 type Config struct {
-	Host string
-	Port string
-	DbName string
-	Username string
-	Password string
+	Host                 string
+	Port                 string
+	DbName               string
+	Username             string
+	Password             string
 	MaxConnectionTimeout time.Duration
-	MaxIdleTime time.Duration
-	MaxConnections int
-	MaxIdleConnections int
+	MaxIdleTime          time.Duration
+	MaxConnections       int
+	MaxIdleConnections   int
 }
 
 func LoadConfig() *Config {
 	config := &Config{
-		Host: os.Getenv("DB_HOST"),
-		Port: os.Getenv("DB_PORT"),
-		DbName: os.Getenv("DB_NAME"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		DbName:   os.Getenv("DB_NAME"),
 		Username: os.Getenv("DB_USERNAME"),
 		Password: os.Getenv("DB_PASSWORD"),
 	}

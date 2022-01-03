@@ -1,7 +1,7 @@
-package domains
+package service
 
 import (
-	"github.com/aerostatka/db-testing/internal/db"
+	"github.com/aerostatka/db-testing/internal/mysql"
 	"go.uber.org/zap"
 )
 
@@ -19,7 +19,7 @@ type DefaultConnectionService struct {
 	dbRep  ConnectionRepository
 }
 
-func CreateDefaultConnectionService(rep *db.ConnectionRepository, log *zap.Logger) *DefaultConnectionService {
+func CreateDefaultConnectionService(rep *mysql.ConnectionRepository, log *zap.Logger) *DefaultConnectionService {
 	return &DefaultConnectionService{
 		logger: log,
 		dbRep:  rep,
