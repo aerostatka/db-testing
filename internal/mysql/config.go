@@ -6,16 +6,27 @@ import (
 	"time"
 )
 
+const (
+	DefaultConnectionTimeout = 5
+	DefaultMaxIdleTime       = 5
+	DefaultTickerDuration    = 15
+	DefaultTickerTime        = 15
+	DefaultMaxConnections    = 10
+	DefaultIdleConnections   = 10
+)
+
 type Config struct {
-	Host                 string
-	Port                 string
-	DbName               string
-	Username             string
-	Password             string
-	MaxConnectionTimeout time.Duration
-	MaxIdleTime          time.Duration
-	MaxConnections       int
-	MaxIdleConnections   int
+	Host                     string
+	Port                     string
+	DbName                   string
+	Username                 string
+	Password                 string
+	MaxConnectionTimeout     time.Duration
+	MaxIdleTime              time.Duration
+	MaxConnections           int
+	MaxIdleConnections       int
+	ConnectionTickerDuration time.Duration
+	ConnectionTickerTime     time.Duration
 }
 
 func LoadConfig() *Config {
@@ -27,32 +38,34 @@ func LoadConfig() *Config {
 		Password: os.Getenv("DB_PASSWORD"),
 	}
 
-	if os.Getenv("DB_TIMEOUT_MINUTES") != "" {
-		minutes, err := strconv.Atoi(os.Getenv("DB_TIMEOUT_MINUTES"))
+	config.MaxConnectionTimeout = time.Minute *
+		time.Duration(getValueFromOsEnv("DB_TIMEOUT_MINUTES", DefaultConnectionTimeout))
 
-		if err != nil {
-			config.MaxConnectionTimeout = time.Minute * 3
-		}
+	config.MaxIdleTime = time.Minute *
+		time.Duration(getValueFromOsEnv("DB_IDLE_TIME_MINUTES", DefaultMaxIdleTime))
 
-		config.MaxConnectionTimeout = time.Minute * time.Duration(minutes)
-	} else {
-		config.MaxConnectionTimeout = time.Minute * 3
-	}
+	config.ConnectionTickerDuration = time.Second *
+		time.Duration(getValueFromOsEnv("DB_TICKER_DURATION_SECONDS", DefaultTickerDuration))
 
-	if os.Getenv("DB_IDLE_TIME_SECONDS") != "" {
-		seconds, err := strconv.Atoi(os.Getenv("DB_IDLE_TIME_SECONDS"))
+	config.ConnectionTickerTime = time.Minute *
+		time.Duration(getValueFromOsEnv("DB_TICKER_TIME_MINUTES", DefaultTickerTime))
 
-		if err != nil {
-			config.MaxIdleTime = time.Second * 10
-		}
-
-		config.MaxIdleTime = time.Second * time.Duration(seconds)
-	} else {
-		config.MaxIdleTime = time.Second * 10
-	}
-
-	config.MaxConnections = 10
-	config.MaxIdleConnections = 10
+	config.MaxConnections = DefaultMaxConnections
+	config.MaxIdleConnections = DefaultIdleConnections
 
 	return config
+}
+
+func getValueFromOsEnv(name string, defaultValue int) int {
+	if os.Getenv(name) != "" {
+		value, err := strconv.Atoi(os.Getenv(name))
+
+		if err != nil {
+			return defaultValue
+		}
+
+		return value
+	} else {
+		return defaultValue
+	}
 }

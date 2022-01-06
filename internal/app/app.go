@@ -14,13 +14,14 @@ import (
 func Start(mode string) {
 	logger := getLogger()
 
-	dbClient, err := getDbClient()
+	dbConfig := mysql.LoadConfig()
+	dbClient, err := getDbClient(dbConfig)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
 	defer dbClient.Close()
 
-	dbRep := mysql.CreateDbConnectionRepository(dbClient, logger)
+	dbRep := mysql.CreateDbConnectionRepository(dbClient, logger, dbConfig)
 	service := service2.CreateDefaultConnectionService(dbRep, logger)
 
 	factory := action.CreateDefaultFactory(service, logger)
@@ -37,7 +38,16 @@ func Start(mode string) {
 	}
 
 	result := action.Perform()
-	fmt.Println(result)
+
+	if result.Result {
+		logger.Info(
+			fmt.Sprintf("Action %s is executed successfully", mode),
+		)
+	} else {
+		logger.Info(
+			fmt.Sprintf("Action %s is executed with an error", mode),
+		)
+	}
 }
 
 func getLogger() *zap.Logger {
@@ -58,8 +68,7 @@ func getLogger() *zap.Logger {
 	return log
 }
 
-func getDbClient() (*sqlx.DB, error) {
-	dbConfig := mysql.LoadConfig()
+func getDbClient(dbConfig *mysql.Config) (*sqlx.DB, error) {
 	client, err := sqlx.Open(
 		"mysql",
 		fmt.Sprintf(
